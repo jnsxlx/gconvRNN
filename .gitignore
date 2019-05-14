@@ -1,3 +1,0 @@
-*.pyc
-datasets/ptb_char/*.pkl
-logs/
