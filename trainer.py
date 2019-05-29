@@ -105,6 +105,7 @@ class Trainer(object):
             for k in trange(self.data_loader.sizes[0], desc="[per_batch]"):
                 # Fetch training data
                 batch_x, batch_y = self.data_loader.next_batch(0)
+
                 batch_x_onehot = batch_x
                 if self.config.model_type == 'lstm':
                     reshaped = batch_x_onehot.reshape([self.config.batch_size, 
@@ -130,6 +131,7 @@ class Trainer(object):
         #Testing
         for n_sample in trange(self.data_loader.sizes[2], desc="Testing"):
            batch_x, batch_y = self.data_loader.next_batch(2)
+
            batch_x_onehot = batch_x
            reshaped = batch_x_onehot.reshape([self.config.batch_size,
                                                   self.config.num_time_steps,

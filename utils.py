@@ -8,6 +8,7 @@ from datetime import datetime
 from IPython import embed
 import tensorflow.contrib.slim as slim
 from scipy.sparse import coo_matrix
+from sklearn import preprocessing
 
 
 def save_config(model_dir, config):
@@ -64,9 +65,9 @@ def convert_to_one_hot(a, max_val=None):
 
 class BatchLoader(object):
     def __init__(self, data_dir, dataset_name, batch_size, seq_length, num_node):
-        train_fname = os.path.join(data_dir, dataset_name, 'data_train.pickle')
-        valid_fname = os.path.join(data_dir, dataset_name, 'data_valid.pickle')
-        test_fname = os.path.join(data_dir, dataset_name, 'data_test.pickle')
+        train_fname = os.path.join(data_dir, dataset_name, 'data_train_3nodes.pickle')
+        valid_fname = os.path.join(data_dir, dataset_name, 'data_valid_3nodes.pickle')
+        test_fname = os.path.join(data_dir, dataset_name, 'data_test_3nodes.pickle')
         input_fnames = [train_fname, valid_fname, test_fname]
 
         alldata_fname = os.path.join(data_dir, dataset_name, 'all_data.pickle')
@@ -89,22 +90,20 @@ class BatchLoader(object):
         #                      [1, 0, 0, 1, 0, 1, 0, 0, 1, 0],  # node 9
         #                      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]  # node 10
         #                      ])
-        self.adj = np.array([[0.6, 0, 0, 0.1, 0, -0.2, 0, 0, 0.1, 0], # node 1
-                   [0, 0.7, 0, 0, 0, 0, 0, 0, 0, 0],       # node 2
-                   [0, 0, 0.7, 0, 0.2, 0, 0, 0, 0, 0],     # node 3
-                   [0.1, 0, 0, 0.6, 0, 0.2, 0, 0, 0.2, 0], # node 4
-                   [0, 0, 0.2, 0, 0.7, 0, 0, 0, 0, 0],     # node 5
-                   [-0.2, 0, 0, 0.2, 0, 0.6, 0, 0, 0.1, 0], # node 6
-                   [0, 0, 0, 0, 0, 0, 0.6, 0, 0, 0],       # node 7
-                   [0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0],       # node 8
-                   [0.1, 0, 0, 0.2, 0, 0.1, 0, 0, 0.6, 0], # node 9
-                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0.7]        # node 10
-                   ])
+        self.adj = np.array([[0.6, 0.2, 0],  # node 1
+                             [0.2, 0.7, 0],  # node 2
+                             [0, 0, 0.7]     # node 3
+                             ])
 
         print("Reshaping tensors...")
         for split, data in enumerate(all_data):  # split = 0:train, 1:valid, 2:test
             length = data.shape[0]
-            data = data[: num_node * batch_size * seq_length * int(math.floor(length / (num_node * batch_size * seq_length)))]
+            data = data[: num_node * batch_size * seq_length * int(
+                math.floor(length / (num_node * batch_size * seq_length)))]
+
+            # normalize data
+            data = preprocessing.normalize(data)
+
             ydata = np.zeros_like(data)
             ydata[:-1] = data[1:].copy()
             ydata[-1] = data[0].copy()

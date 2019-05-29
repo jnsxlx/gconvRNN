@@ -46,7 +46,7 @@ model_arg.add_argument('--model_type', type=str, default='glstm',
 
 # Hyperparams for graph
 graph_arg = add_argument_group('Graph')
-graph_arg.add_argument('--num_node', type=int, default=10, help='') # 50
+graph_arg.add_argument('--num_node', type=int, default=3, help='') # 50
 graph_arg.add_argument('--feat_in', type=int, default=1, help='')
 graph_arg.add_argument('--feat_out', type=int, default=1, help='')
 graph_arg.add_argument('--num_hidden', type=int, default=50, help='')
